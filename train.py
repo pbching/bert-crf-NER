@@ -123,10 +123,12 @@ dev_set.numberize()
 
 
 _embedding_layers = _Embedding(config)
+_embedding_layers.roberta.encoder.gradient_checkpointing = True
 _embedding_layers.to(device)
 
 ner_model = NERClassifier(config)
 ner_model.to(device)
+
 model_parameters = [(n, p) for n, p in _embedding_layers.named_parameters()] + \
                                     [(n, p) for n, p in ner_model.named_parameters()]
 
@@ -136,6 +138,7 @@ param_groups = [
                     'lr': config.learning_rate, 'weight_decay': config.weight_decay
                 }
             ]
+
 optimizer = AdamW(params=param_groups)
 batch_num = len(train_set) // config.batch_size
 schedule = get_linear_schedule_with_warmup(optimizer,
@@ -152,7 +155,7 @@ eval_batch_num = len(dev_set) // config.batch_size
 for epoch in range(1, config.num_train_epochs):
     print('*' * 30)
     print('NER: Epoch: {}'.format(epoch))
-    # training set
+    # training
     _embedding_layers.train()
     ner_model.train()
     optimizer.zero_grad()
@@ -194,7 +197,7 @@ for epoch in range(1, config.num_train_epochs):
         for k, v in ner_model.state_dict().items():
             if k in trainable_weight_names:
                 state[k] = v
-        ckpt_fpath=f'./model_checkpoint/ckpt_{epoch}.pt'
+        ckpt_fpath=f'model_checkpoint/ckpt_{epoch}.pt'
         torch.save(state, ckpt_fpath)
         print('Saving weights to ... {})'.format(ckpt_fpath))
 

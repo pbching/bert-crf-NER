@@ -4,6 +4,7 @@ import numpy as np
 import math
 from numbers import Number
 
+
 class CRFLoss(nn.Module):
     """
     Calculate log-space crf loss, given unary potentials, a transition matrix

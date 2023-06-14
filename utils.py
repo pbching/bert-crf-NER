@@ -31,7 +31,7 @@ train_batch_fields = [
 ]
 Train_Batch = namedtuple('Train_Batch', field_names=train_batch_fields)
 
-def word_lens_to_idxs_fast(token_lens):
+def word_lens_to_idxs(token_lens):
     max_token_num = max([len(x) for x in token_lens]) # max num of tokens
     max_token_len = max([max(x) for x in token_lens]) # max subword length
     idxs, masks = [], []
@@ -63,20 +63,6 @@ def compute_word_reps_avg(piece_reprs, component_idxs):
         batch_word_reprs.append(word_reprs)
     batch_word_reprs = torch.stack(batch_word_reprs, dim=0)  # [batch size, num words, rep dim]
     return batch_word_reprs
-
-def word_lens_to_idxs(word_lens):
-    max_token_num = max([len(x) for x in word_lens])
-    max_token_len = max([max(x) for x in word_lens])
-    idxs = []
-    for seq_token_lens in word_lens:
-        seq_idxs = []
-        offset = 0
-        for token_len in seq_token_lens:
-            seq_idxs.append([offset, offset + token_len])
-            offset += token_len
-        seq_idxs.extend([[-1, 0]] * (max_token_num - len(seq_token_lens)))
-        idxs.append(seq_idxs)
-    return idxs, max_token_num, max_token_len
 
 def decode_from_bioes(tags):
     res = []

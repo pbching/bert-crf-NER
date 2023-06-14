@@ -79,11 +79,6 @@ class NERClassifier(nn.Module):
 
         self.crit = CRFLoss(self.entity_label_num)
 
-        if not config.training:
-            # load pretrained weights
-            self.initialized_weights = self.state_dict()
-            self.load_state_dict(self.initialized_weights)
-
     def forward(self, batch, word_reprs):
         batch_size, _, _ = word_reprs.size()
         logits = self.entity_label_ffn(word_reprs)

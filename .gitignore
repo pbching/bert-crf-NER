@@ -1,0 +1,4 @@
+venv/
+model_checkpoint/
+__pycache__/
+test*
